@@ -1,0 +1,104 @@
+/* static/main.css */
+:root {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --text: #e0e0e0;
+  --accent: #66fcf1;
+  --accent-dark: #45a29e;
+}
+html, body {
+  margin: 0; padding: 0;
+  height: 100%; width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  display: flex; align-items: center; justify-content: center;
+}
+.form-container {
+  background: var(--card);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 360px;
+}
+.form-container h1 {
+  margin-bottom: 1.5rem;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 1px;
+}
+.form-container form {
+  display: flex;
+  flex-direction: column;
+}
+.form-container input {
+  background: #2e2e2e;
+  border: 1px solid var(--accent-dark);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+.form-container input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-container button {
+  background: var(--accent-dark);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.form-container button:hover {
+  background: var(--accent);
+}
+.form-container p {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.form-container a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.form-container a:hover {
+  text-decoration: underline;
+}
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.toast {
+  background: var(--card);
+  color: var(--text);
+  border-left: 4px solid var(--accent);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  opacity: 1;
+  /* duration 0.5s, easing, delay 3s, keep final state */
+  animation: fadeOut 0.5s ease-in-out 3s forwards;
+}
+
+.toast-success { border-color: var(--accent); }
+.toast-danger  { border-color: #c70039; }
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

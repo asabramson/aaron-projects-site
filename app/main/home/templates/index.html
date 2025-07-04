@@ -1,15 +1,19 @@
+<!-- REPLACE LATER -->
 <!DOCTYPE HTML>
 <html>
   <head>
     <title>Flask Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
   </head>
   <body>
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-       <div style = "background-color: lightblue; margin: 10px 0px 10px 0px; padding: 25px;">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="toast-container">
+        {% for category, msg in messages %}
+          <div class="toast toast-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
   {% endwith %}
 
     <h1> Hello!</h1>

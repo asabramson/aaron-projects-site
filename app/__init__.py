@@ -3,7 +3,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_moment import Moment
+# from flask_moment import Moment
 
 
 
@@ -11,11 +11,11 @@ from flask_moment import Moment
 db = SQLAlchemy()
 
 migrate = Migrate()
-# TODO: (milestone 3) create LoginManager object and configure the login view as 'auth.login', i.e, `login` route in `auth` Blueprint. 
-# login = LoginManager() UNCOMMENT LATER
-# login.login_view = 'auth.login' UNCOMMENT LATER
-# TODO: (milestone 3) create Moment object
-moment = Moment()
+# create LoginManager object and configure the login view as 'auth.login', i.e, `login` route in `auth` Blueprint. 
+login = LoginManager()
+login.login_view = 'auth.login'
+# create Moment object
+#moment = Moment()
 
 
 def create_app(config_class=Config):
@@ -26,19 +26,19 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app,db)
-    # TODO: (milestone 3) Configure the app object for login using `init_app` function. 
-    # login.init_app(app) UNCOMMENT LATER
-    # TODO: (milestone 3) Configure the app object for moment using `init_app` function. 
-    moment.init_app(app)
+    # Configure the app object for login using `init_app` function. 
+    login.init_app(app)
+    # Configure the app object for moment using `init_app` function. 
+    #moment.init_app(app)
 
     # blueprint registration
     from app.main.home import main_blueprint as main
     main.template_folder = Config.TEMPLATE_FOLDER_MAIN
     app.register_blueprint(main)
 
-    # from app.auth import auth_blueprint as auth
-    # auth.template_folder = Config.TEMPLATE_FOLDER_AUTH
-    # app.register_blueprint(auth)
+    from app.auth import auth_blueprint as auth
+    auth.template_folder = Config.TEMPLATE_FOLDER_AUTH
+    app.register_blueprint(auth)
 
     # from app.errors import error_blueprint as errors
     # errors.template_folder = Config.TEMPLATE_FOLDER_ERRORS

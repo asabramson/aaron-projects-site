@@ -1,0 +1,41 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="toast-container">
+        {% for category, msg in messages %}
+          <div class="toast toast-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+
+  <div class="form-container">
+    <h1>Create Account</h1>
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      {{ form.hidden_tag()}}
+
+      <p>{{ form.username.label}} 
+         {{ form.username()}}
+      </p>
+      <p>{{ form.password.label}} 
+         {{ form.password()}}
+      </p>
+      <p>{{ form.password2.label}} 
+         {{ form.password2()}}
+      </p>
+      <p>{{ form.submit()}}</p>
+    </form>
+    <p>Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+  </div>
+</body>
+</html>
