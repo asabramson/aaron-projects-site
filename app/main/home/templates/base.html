@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if title %}
+      <title>{{ title }}</title>
+    {% else %}
+      <title>Aaron's Projects</title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+  </head>
+  <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="toast-container">
+        {% for category, msg in messages %}
+          <div class="toast toast-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+
+      <!-- floating “info” button -->
+    <button id="info-btn" class="info-btn">i</button>
+
+    <!-- hidden popup menu -->
+    <div id="info-menu" class="info-menu">
+      <ul>
+        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="#">Account Settings</a></li>
+          <li><a href="#">Log Out</a></li>
+        {% else %}
+          <li><a href="#">Log In</a></li>
+          <li><a href="#">Register</a></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <script>
+      // toggle the menu when “i” is clicked, close if clicking elsewhere
+      document.addEventListener('click', e => {
+        const btn  = document.getElementById('info-btn');
+        const menu = document.getElementById('info-menu');
+        if (btn.contains(e.target)) {
+          menu.classList.toggle('visible');
+        } else if (!menu.contains(e.target)) {
+          menu.classList.remove('visible');
+        }
+      });
+    </script>
+  </body>

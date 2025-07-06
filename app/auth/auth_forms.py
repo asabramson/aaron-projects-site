@@ -9,7 +9,7 @@ from app.main.models import User
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators = [DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Repeat', validators=[DataRequired(), EqualTo('password')])
+    password2 = PasswordField('Repeat', validators=[DataRequired(), EqualTo('password', message='Passwords do not match!')])
 
     submit = SubmitField('Register')
 

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1> Hello!</h1>
+  
+    <h2>Current Courses:</h2>
+    <ul>
+      {% for course in courses %}
+        <li> <a href="{{url_for('main.course', course_id = course.id) }}" > 
+                   {{ course.major}}{{course.coursenum}}-{{course.title}}  </a> in {{course.classroom.building}}-{{course.classroom.roomNumber}}</li>
+      {% endfor %}
+    </ul>
+    <h2>Add New Course:</h2>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <p>{{ form.major.label}} 
+         {{ form.major()}}
+      </p>
+      <p>{{ form.coursenum.label}} 
+        {{ form.coursenum()}}
+     </p>
+     <p>{{ form.title.label}} 
+      {{ form.title()}}
+     </p>
+     <p>{{ form.classroom.label}} 
+      {{ form.classroom()}}
+     </p>
+    <p>{{ form.submit()}}</p>
+    </form>
+
+{% endblock %}

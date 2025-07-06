@@ -18,9 +18,13 @@ def register():
         user.set_password(rform.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you have successfully registered!')
+        flash('Congratulations, you have successfully registered!', 'success')
         return redirect(url_for('main.index'))
-    return render_template('register.html', form=rform)
+    if rform.is_submitted() and not rform.validate():
+        for field, error_list in rform.errors.items():
+            for error in error_list:
+                flash(error, 'danger')
+    return render_template('register.html', title="Registration" ,form=rform)
 
 
 @bp_auth.route('/user/login', methods=['GET', 'POST'])
@@ -34,16 +38,16 @@ def login():
         user = db.session.scalars(query).first()
         # If provided user doesn't exist or entered password is incorrect
         if (user is None):
-            flash('Input username does not exist!')
+            flash('Input username does not exist!', 'danger')
             return redirect(url_for('auth.login'))
         if (user.check_password(lform.password.data) == False):
-            flash('Password incorrect, please try again!')
+            flash('Password incorrect, please try again!', 'danger')
             return redirect(url_for('auth.login'))
         # Else (successful login)
         login_user(user, remember=lform.remember_me.data)
-        flash('The user {} has sucessfully logged in!'.format(current_user.username))
+        flash('Welcome back {}!'.format(current_user.username), 'success')
         return redirect(url_for('main.index'))
-    return render_template('login.html', form = lform)
+    return render_template('login.html', title="Login", form = lform)
 
 @bp_auth.route('/user/logout', methods=['GET'])
 @login_required

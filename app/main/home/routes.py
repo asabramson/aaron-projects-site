@@ -9,9 +9,13 @@ import sqlalchemy as sqla
 from app.main.home import main_blueprint as bp_main
 
 
-@bp_main.route('/', methods=['GET', 'POST'])
-@bp_main.route('/index', methods=['GET', 'POST'])
+@bp_main.route('/', methods=['GET'])
+@bp_main.route('/index', methods=['GET'])
 def index():  
+    return render_template('index.html')
+
+@bp_main.route('/test', methods=['GET', 'POST'])
+def testFunc():  
     form = CourseForm()
     if form.validate_on_submit():
         if (form.major.data is not None) and (form.coursenum.data is not None):
@@ -24,7 +28,7 @@ def index():
                 return redirect(url_for('main.course', course_id = newcourse.id) )
     # display existing courses
     all_courses = db.session.scalars(sqla.select(Course).order_by(Course.major)).all()
-    return render_template('index.html', form=form, courses = all_courses)
+    return render_template('ogIndex.html', form=form, courses = all_courses)
 
 @bp_main.route('/course/<course_id>/assignta', methods = ['GET', 'POST'])
 def course(course_id):

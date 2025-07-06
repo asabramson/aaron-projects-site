@@ -1,47 +1,131 @@
-<!-- REPLACE LATER -->
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>Flask Example</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-  </head>
-  <body>
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="toast-container">
-        {% for category, msg in messages %}
-          <div class="toast toast-{{ category }}">{{ msg }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+{% extends "base.html" %}
 
-    <h1> Hello!</h1>
-  
-    <h2>Current Courses:</h2>
-    <ul>
-      {% for course in courses %}
-        <li> <a href="{{url_for('main.course', course_id = course.id) }}" > 
-                   {{ course.major}}{{course.coursenum}}-{{course.title}}  </a> in {{course.classroom.building}}-{{course.classroom.roomNumber}}</li>
-      {% endfor %}
-    </ul>
-    <h2>Add New Course:</h2>
-    <form method="POST">
-      {{ form.hidden_tag() }}
-      <p>{{ form.major.label}} 
-         {{ form.major()}}
-      </p>
-      <p>{{ form.coursenum.label}} 
-        {{ form.coursenum()}}
-     </p>
-     <p>{{ form.title.label}} 
-      {{ form.title()}}
-     </p>
-     <p>{{ form.classroom.label}} 
-      {{ form.classroom()}}
-     </p>
-    <p>{{ form.submit()}}</p>
-    </form>
+{% block content %}
 
-  </body>
-</html>
+  <div class="index-container">
+    <h1>Welcome to My CS Projects</h1>
+    <p class="subtitle">Click any project below to explore!</p>
+
+    <div class="project-grid">
+      <!-- repeat this block for each project -->
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project1-thumb.png') }}"
+             alt="Project 1 Thumbnail">
+        <div class="card-content">
+          <h2>Project One</h2>
+          <p>Save-your-score game</p>
+        </div>
+      </a>
+
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+      <a href="#" class="project-card">
+        <img src="{{ url_for('static', filename='images/project2-thumb.png') }}"
+             alt="Project 2 Thumbnail">
+        <div class="card-content">
+          <h2>Project Two</h2>
+          <p>Interactive simulation</p>
+        </div>
+      </a>
+
+      <!-- …more cards… -->
+    </div>
+  </div>
+
+{% endblock %}
