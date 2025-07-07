@@ -40,8 +40,8 @@ def create_app(config_class=Config):
     auth.template_folder = Config.TEMPLATE_FOLDER_AUTH
     app.register_blueprint(auth)
 
-    # from app.errors import error_blueprint as errors
-    # errors.template_folder = Config.TEMPLATE_FOLDER_ERRORS
-    # app.register_blueprint(errors)
+    from app.errors import error_blueprint as errors
+    errors.template_folder = Config.TEMPLATE_FOLDER_ERRORS
+    app.register_blueprint(errors)
 
     return app

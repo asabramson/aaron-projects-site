@@ -45,7 +45,7 @@ def login():
             return redirect(url_for('auth.login'))
         # Else (successful login)
         login_user(user, remember=lform.remember_me.data)
-        flash('Welcome back {}!'.format(current_user.username), 'success')
+        flash('Welcome back, {}!'.format(current_user.username), 'success')
         return redirect(url_for('main.index'))
     return render_template('login.html', title="Login", form = lform)
 
@@ -53,4 +53,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('main.index'))
