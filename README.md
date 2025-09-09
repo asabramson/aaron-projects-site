@@ -7,7 +7,7 @@ A full list of each project, ordered by date of completion, is available below:
 | Date | Title | Brief Description |
 | ----------- | ----------- | ----------- |
 | 7/5/25 | Website Homepage | The index page offers navigation to each project, with each being displayed in a grid-like manner. Users may choose to login to save statistics when interacting with different projects. |
-| 1/2/3 | Lasker Morris Game | Description goes here! |
+| 9/9/25 | Lasker Morris Game | Lasker Morris is very similar to the game *Nine Men's Morris*, and is in the middle of Tic Tac Toe and Chess in terms of complexity. I developed an AI player using a modified Minimax alpha/beta algorithm which plays at a near perfect level (it may be possible to beat, I have only managed to stalemate it!). |
 
 If you wish to clone the repository to use for offline use, simply install the requirements using `pip` (ensure you are using Python 3.9 or newer!):
 

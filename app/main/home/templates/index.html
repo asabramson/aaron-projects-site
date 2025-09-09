@@ -8,12 +8,12 @@
 
     <div class="project-grid">
       <!-- repeat this block for each project -->
-      <a href="#" class="project-card">
+      <a href="{{ url_for('lm.laskermorris')}}" class="project-card">
         <img src="{{ url_for('static', filename='images/project1-thumb.png') }}"
-             alt="Project 1 Thumbnail">
+             alt="Lasker Morris Thumbnail">
         <div class="card-content">
-          <h2>Project One</h2>
-          <p>Save-your-score game</p>
+          <h2>Lasker Morris</h2>
+          <p>Can you beat the AI player?</p>
         </div>
       </a>
 

@@ -3,7 +3,8 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-# from flask_moment import Moment
+from flask_wtf.csrf import CSRFProtect
+# from flask_moment import Moment - used for JS date and time conversions
 
 
 
@@ -24,6 +25,8 @@ def create_app(config_class=Config):
     app.static_folder = config_class.STATIC_FOLDER
     app.template_folder = config_class.TEMPLATE_FOLDER_MAIN
 
+    csrf = CSRFProtect(app)
+
     db.init_app(app)
     migrate.init_app(app,db)
     # Configure the app object for login using `init_app` function. 
@@ -39,6 +42,10 @@ def create_app(config_class=Config):
     from app.auth import auth_blueprint as auth
     auth.template_folder = Config.TEMPLATE_FOLDER_AUTH
     app.register_blueprint(auth)
+
+    from app.main.lasker_morris import laskermorris_blueprint as lm
+    lm.template_folder = Config.TEMPLATE_FOLDER_LM
+    app.register_blueprint(lm)
 
     from app.errors import error_blueprint as errors
     errors.template_folder = Config.TEMPLATE_FOLDER_ERRORS

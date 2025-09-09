@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<body>
+  <div id="container-lm">
+    <div id="board-container-lm">
+      <!-- The game board uses the below SVG elements for the lines, the circles are created in the JS using w3 namespace -->
+      <svg id="board-lm" width="600" height="600" viewBox="-15 -15 630 630">
+        <rect x="0" y="0" width="600" height="600" class="board-line-lm"/>
+        <rect x="100" y="100" width="400" height="400" class="board-line-lm"/>
+        <rect x="200" y="200" width="200" height="200" class="board-line-lm"/>
+        <line x1="300" y1="0"   x2="300" y2="200" class="board-line-lm"/>
+        <line x1="300" y1="400" x2="300" y2="600" class="board-line-lm"/>
+        <line x1="0"   y1="300" x2="200" y2="300" class="board-line-lm"/>
+        <line x1="400" y1="300" x2="600" y2="300" class="board-line-lm"/>
+      </svg>
+    </div>
+    <div id="side-panel-lm">
+      <!-- The user is always blue (and always goes first as player1) and the AI is always red/orange (and always goes second as player2) -->
+      <h3>Your Hand</h3>
+      <svg id="hand-user" class="hand-svg-lm"></svg>
+      <h3>Opponent Hand</h3>
+      <svg id="hand-ai" class="hand-svg-lm"></svg>
+
+      <hr>
+
+      <div id="turn-counter" class="stat-lm">Turn: 1</div>
+      <br><br>
+      <div id="user-count" class="stat-lm">Blue left: 10</div>
+      <br>
+      <div id="ai-count" class="stat-lm">Red left: 10</div>
+      <hr><br>
+
+      <button class="btn btn-primary" data-open-modal="aboutModal">Game Info</button>
+
+    </div>
+  </div>
+  <!-- Modal template (used in other places on my site too!)-->
+  <div class="modal-backdrop" id="aboutModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <div class="modal-header">
+        <h2 class="modal-title" id="aboutTitle">About Lasker Morris</h2>
+      </div>
+      <div class="modal-body">
+        <p>
+          Lasker Morris follows a similar format to <em>Nine Men's Morris</em> (<a href="https://en.wikipedia.org/wiki/Nine_men%27s_morris" target="_blank">read the rules on Wikipedia</a>) with one small difference: you do not need to use all of your hand pieces before transitioning to the moving adjacent tiles phase, you can choose to play from hand or a piece already on the board at any time in the game.
+        </p>
+        <p>
+          In traditional play, a player loses after getting down to 2 pieces. I upped it to a 3 piece loss, as the AI plays so efficiently that games will never end without the looser game rules. I am considering adding a difficulty slider, which when lowered will increase the chance of the AI playing a random, nonsensical move. The current difficulty would be considered 100%!
+        </p>
+        <p>
+          I developed the AI player with a variation of the minimax algorithm, with some alpha-beta pruning to shrink game-tree searches. The algorithm performs at a near perfect level, but it is possible to outsmart (try looking at the source code published in the 'lasker_morris_player.py' file in this repository!).
+        </p>
+        <p>
+          The AI player is currently set to "think" about its move for 1 second (technically 0.95 of a second, the last 5% is saved for resolving the recursion branches). Interestingly, if this processing time is increased, it would be expected that the AI could produce the same, if not a better move. However, when given more time to "think", the AI almost always performs worse; I would assume that this is due to horizon effects, but it is hard to say for sure (feel free to test the 'lasker_morris_player.py' code locally and see this phenomenon in action!).
+        </p>
+        <p>
+          Over the past few years, research on traditional AI approaches has been neglected in exchange for deep learning-based approaches (which in all fairness, is not without good reason). I initially started this project for one of my undergrad courses, but chose to continue it (greatly improve the algorithm efficiency, create the entire frontend and communication API) due to my love for classical, decision tree approaches. One of my primary areas of study in my MS is how symbolic AI can be used in conjunction with neural-based models (<a href="https://en.wikipedia.org/wiki/Neuro-symbolic_AI" target="_blank">read more about neuro-symbolic on Wikipedia</a>).
+        </p>
+      </div>
+      <div class="modal-footer">
+        <div class="btn-group">
+          <button class="btn btn-outline" data-close-modal>Close</button>
+          <!-- <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go to Home</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal used for displaying game end message (win, loss, stalemate) -->
+  <div id="gameover-modal" class="modal-lm" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+    <div class="modal-card-lm">
+      <h2 id="gameover-title">Game Over</h2>
+      <p id="gameover-text"></p>
+      <button id="play-again">Play again</button>
+    </div>
+  </div>
+  <script>
+    const VALID_SPACES = ['a1','d1','g1','b2','d2','f2','c3','d3','e3','a4','b4','c4','e4','f4','g4','c5','d5','e5','b6','d6','f6','a7','d7','g7'];
+    const ADJACENCY = { a1:['d1','a4'],d1:['a1','g1','d2'],g1:['d1','g4'],b2:['d2','b4'],d2:['b2','f2','d1','d3'],f2:['d2','f4'],c3:['d3','c4'],d3:['c3','e3','d2'],e3:['d3','e4'],a4:['a1','a7','b4'],b4:['a4','c4','b2','b6'],c4:['b4','c3','c5'],g4:['g1','g7','f4'],f4:['g4','f2','f6','e4'],e4:['e3','f4','e5'],a7:['a4','d7'],d7:['a7','g7','d6'],g7:['d7','g4'],b6:['b4','d6'],d6:['b6','f6','d7','d5'],f6:['d6','f4'],c5:['c4','d5'],d5:['c5','e5','d6'],e5:['d5','e4'] };
+    const MILL_LINES = [ ['a1','d1','g1'],['b2','d2','f2'],['c3','d3','e3'],['a4','b4','c4'],['e4','f4','g4'],['c5','d5','e5'],['b6','d6','f6'],['a7','d7','g7'],['a1','a4','a7'],['b2','b4','b6'],['c3','c4','c5'],['d1','d2','d3'],['d5','d6','d7'],['e3','e4','e5'],['f2','f4','f6'],['g1','g4','g7'] ];
+    const letterToIndex = {a:0,b:1,c:2,d:3,e:4,f:5,g:6};
+
+    let gameState = {
+      occupancy: {},
+      selectedSource: null,
+      awaitingRemoval: false,
+      pendingMove: null,
+      handCounts: { player1: 10, player2: 10 },
+      terminal: false,
+      turnCount: 1
+    };
+    const boardSvg = document.getElementById('board-lm');
+    const handUserSvg = document.getElementById('hand-user');
+    const handAiSvg   = document.getElementById('hand-ai');
+
+    const modal        = document.getElementById('gameover-modal');
+    const modalText    = document.getElementById('gameover-text');
+    const playAgainBtn = document.getElementById('play-again');
+    if (playAgainBtn) playAgainBtn.addEventListener('click', () => window.location.reload());
+
+
+    function initializeBoard() {
+      VALID_SPACES.forEach(pos => {
+        const letter = pos[0], num = parseInt(pos[1], 10);
+        const x = letterToIndex[letter]*100, y = (num-1)*100;
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 15);
+        c.classList.add('position'); c.dataset.pos = pos;
+        c.addEventListener('click', onPositionClick);
+        boardSvg.appendChild(c);
+      });
+    }
+
+    function renderHands() {
+      handUserSvg.innerHTML = '';
+      handAiSvg.innerHTML   = '';
+      for(let i = 0; i < gameState.handCounts.player1; i++) {
+        handUserSvg.appendChild(createHandCircle(i, 'player1'));
+      }
+      for(let i = 0; i < gameState.handCounts.player2; i++) {
+        handAiSvg.appendChild(createHandCircle(i, 'player2'));
+      }
+    }
+
+    function createHandCircle(idx, player) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', 20 + idx*15);
+      c.setAttribute('cy', 30);
+      c.setAttribute('r', 10);
+      c.classList.add('position', 'hand', `${player}-hand`);
+      c.dataset.handPlayer = player;
+      if(player === 'player1') c.addEventListener('click', onHandClick);
+      return c;
+    }
+
+    function onHandClick(e) {
+      if (gameState.terminal) return;
+      if(gameState.awaitingRemoval) return;
+      const target = e.target;
+      if(gameState.selectedSource === 'h') return clearHighlights();
+      clearHighlights();
+      gameState.selectedSource = 'h';
+      target.classList.add('selected');
+      VALID_SPACES.forEach(p => {
+        if(!gameState.occupancy[p])
+          document.querySelector(`circle[data-pos='${p}']`).classList.add('highlight');
+      });
+    }
+
+    function onPositionClick(e) {
+      if (gameState.terminal) return;
+      const pos = e.target.dataset.pos;
+      if(gameState.selectedSource === pos) return clearHighlights();
+      if(gameState.awaitingRemoval) {
+        if(gameState.occupancy[pos])
+          finalizeMove(gameState.pendingMove.src, gameState.pendingMove.dest, pos);
+        return;
+      }
+      if(!gameState.selectedSource) {
+        if(gameState.occupancy[pos] === 'player1')
+          return selectSource(pos, e.target);
+      } else {
+        const src = gameState.selectedSource;
+        if(src === 'h' && !gameState.occupancy[pos])
+          return handleMove(src, pos);
+        if(src !== 'h' && !gameState.occupancy[pos] && ADJACENCY[src].includes(pos))
+          return handleMove(src, pos);
+      }
+    }
+
+    function selectSource(pos, el) {
+      clearHighlights();
+      gameState.selectedSource = pos;
+      el.classList.add('selected');
+      ADJACENCY[pos].forEach(d => {
+        if(!gameState.occupancy[d])
+          document.querySelector(`circle[data-pos='${d}']`).classList.add('highlight');
+      });
+    }
+
+    function handleMove(src, dest) {
+      const mill = checkMill('player1', dest, src);
+      if(mill) startRemovalPhase(src, dest);
+      else sendMove(src, dest, 'r0');
+    }
+
+    function checkMill(player, dest, src) {
+      const occ = { ...gameState.occupancy };
+      if(src !== 'h') delete occ[src];
+      occ[dest] = player;
+      return MILL_LINES.some(line => line.includes(dest) && line.every(p => occ[p] === player));
+    }
+
+    function startRemovalPhase(src, dest) {
+      clearHighlights();
+      gameState.awaitingRemoval = true;
+      gameState.pendingMove = { src, dest };
+      Object.entries(gameState.occupancy).forEach(([p,pl]) => {
+        if(pl !== 'player1')
+          document.querySelector(`circle[data-pos='${p}']`).classList.add('removal');
+      });
+    }
+
+    function finalizeMove(src, dest, rem) {
+      clearHighlights();
+      gameState.awaitingRemoval = false;
+      sendMove(src, dest, rem);
+    }
+
+    // Calls /move POST request
+    function sendMove(src, dest, rem) {
+      // Token created in meta tag in 'base.html'
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      // Apply move from user
+      applyMove('player1', src, dest, rem);
+      // Send to backend
+      fetch('/move', {
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ source: src, dest: dest, removal: rem })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.aiMove) {
+          applyMove('player2', data.aiMove.source, data.aiMove.dest, data.aiMove.removal);
+        }
+        if (data.gameOver) {
+          evaluateAndShowGameOver();
+        }
+      })
+      .catch(console.error);
+      clearHighlights();
+    }
+
+    function applyMove(player, src, dest, rem) {
+      console.log(gameState.handCounts.player1);
+      console.log(gameState.handCounts.player2);
+      const opp = player === 'player1' ? 'player2' : 'player1';
+      if(src === 'h') {
+        gameState.handCounts[player]--;
+        renderHands();
+      } else {
+        delete gameState.occupancy[src];
+        document.querySelector(`circle[data-pos='${src}']`).classList.remove(player);
+      }
+      gameState.occupancy[dest] = player;
+      document.querySelector(`circle[data-pos='${dest}']`).classList.add(player);
+      if(rem && rem !== 'r0') {
+        delete gameState.occupancy[rem];
+        document.querySelector(`circle[data-pos='${rem}']`).classList.remove(opp);
+      }
+      gameState.turnCount++;
+      updateTurnCounter();
+    }
+
+    function countBoardPieces(player){
+      let n = 0;
+      for (const pos in gameState.occupancy) if (gameState.occupancy[pos] === player) n++;
+      return n;
+    }
+
+    function totalPieces(player){
+      // console.log("Your total is:"); debugging!
+      // console.log(gameState.handCounts[player]); debugging!
+      return countBoardPieces(player) + (gameState.handCounts[player] || 0);
+    }
+
+    function evaluateAndShowGameOver(){
+      const p1 = totalPieces('player1');
+      const p2 = totalPieces('player2');
+      let msg = '';
+      if (p1 <= 3 && p2 > 3)      msg = 'You lose!';
+      else if (p2 <= 3 && p1 > 3) msg = 'You win!';
+      else                        msg = 'Draw by stalemate!';
+      showGameOver(msg);
+    }
+
+    function showGameOver(message){
+      gameState.terminal = true;
+      if (modalText) modalText.textContent = message;
+      if (modal) modal.classList.add('show');
+    }
+
+    function updateTurnCounter(){
+      const e = document.getElementById('turn-counter');
+      const e1 = document.getElementById('user-count');
+      const e2 = document.getElementById('ai-count');
+
+      total1 = totalPieces('player1');
+      total2 = totalPieces('player2');
+
+      if (e) e.textContent = `Turn: ${gameState.turnCount}`;
+      e1.textContent = `Blue left: ${total1}`;
+      e2.textContent = `Red left: ${total2}`;
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('.highlight,.selected,.removal').forEach(c=>c.classList.remove('highlight','selected','removal'));
+      gameState.selectedSource = null;
+    }
+
+    initializeBoard();
+    renderHands();
+  </script>
+
+{% endblock %}

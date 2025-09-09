@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {% if title %}
       <title>{{ title }}</title>
     {% else %}
@@ -22,10 +23,10 @@
     {% endwith %}
     {% block content %}{% endblock %}
 
-      <!-- floating “info” button -->
+      <!-- Floating "i" button -->
     <button id="info-btn" class="info-btn">i</button>
 
-    <!-- hidden popup menu -->
+    <!-- Popup menu when clicking "i" -->
     <div id="info-menu" class="info-menu">
       <ul>
         <li><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -40,7 +41,7 @@
     </div>
 
     <script>
-      // toggle the menu when “i” is clicked, close if clicking elsewhere
+      // Toggle the menu when “i” is clicked, close if clicking elsewhere
       document.addEventListener('click', e => {
         const btn  = document.getElementById('info-btn');
         const menu = document.getElementById('info-menu');
@@ -48,6 +49,39 @@
           menu.classList.toggle('visible');
         } else if (!menu.contains(e.target)) {
           menu.classList.remove('visible');
+        }
+      });
+
+      // Anywhere the standard modal is used (look for "modal-backdrop" and "modal" classes) this script is ran
+      document.addEventListener('click', function(e) {
+        const openBtn = e.target.closest('[data-open-modal]');
+        const closeBtn = e.target.closest('[data-close-modal]');
+        const backdrop = e.target.classList.contains('modal-backdrop');
+
+        if (openBtn) {
+          const id = openBtn.getAttribute('data-open-modal');
+          const modal = document.getElementById(id);
+          if (modal) {
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            const focusTarget = modal.querySelector('[data-close-modal]') || modal.querySelector('button, a, [tabindex]');
+            focusTarget && focusTarget.focus();
+          }
+        }
+
+        // Close button
+        if (closeBtn) {
+          const backdropEl = closeBtn.closest('.modal-backdrop');
+          if (backdropEl) {
+            backdropEl.classList.remove('open');
+            backdropEl.setAttribute('aria-hidden', 'true');
+          }
+        }
+
+        // Close on clicking outside the modal area
+        if (backdrop) {
+          e.target.classList.remove('open');
+          e.target.setAttribute('aria-hidden', 'true');
         }
       });
     </script>
