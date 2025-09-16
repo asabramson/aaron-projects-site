@@ -68,7 +68,7 @@ MILLS = [
 ]
 
 # Flag for immediate mode evaluation (possible mills on next move)
-IMMEDIATE_MODE = False
+# IMMEDIATE_MODE = False
 
 
 # USED FOR DEBUGGING TO SEPARATE TEXT FILE TO NOT CONFUSE REFEREE WITH STDOUT
@@ -236,14 +236,12 @@ def is_terminal_frontend(state):
         if count_board_pieces(state, color) + state["hand"][color] <= 3:
             return True
     if state["mill_counter"] >= 20:
-        # print("Stalemate reached!")
         return True
     return False
 
 # Uses a series of heuristics to evaluate the value of the current game state
 # Returns the heuristic value of the current game state
-def evaluate(state, player, is_root):
-    global IMMEDIATE_MODE
+def evaluate(state, player, immediate):
     opponent = "blue" if player == "orange" else "orange"
     board = state["board"]
     move_played = state["move_played"]
@@ -256,7 +254,7 @@ def evaluate(state, player, is_root):
             return 10000 # we win the game
         return 0
     
-    if IMMEDIATE_MODE:
+    if immediate:
         if forms_mill(board, move_played, player):
             score += 5000 # we form a mill on our next turn
         
@@ -281,17 +279,19 @@ def evaluate(state, player, is_root):
 
 # Minimax algorithm using alpha-beta pruning to find the best move at a given depth
 # Returns the value of the best move found by the algorithm and the move itself
-def alphabeta(state, depth, alpha, beta, maximizing_player, player, start_time, is_root=False):
+def alphabeta(state, depth, alpha, beta, maximizing_player, player, start_time, from_root):
     if time.time() - start_time > TIME_LIMIT * 0.95: # save 5% of our move time for final calculations
-        return evaluate(state, player, is_root), None
+        return evaluate(state, player, immediate=(from_root==1)), None
 
     if depth == 0 or is_terminal(state):
-        return evaluate(state, player, is_root), None
+        return evaluate(state, player, immediate=(from_root==1)), None
 
-    if is_root:
-        legal_moves = generate_moves(state, player)
-    else:
-        legal_moves = generate_moves(state, state["turn"])
+    # if is_root:
+    #     legal_moves = generate_moves(state, player)
+    # else:
+    #     legal_moves = generate_moves(state, state["turn"])
+
+    legal_moves = generate_moves(state, player) if from_root == 0 else generate_moves(state, state["turn"])
 
     best_move = None
 
@@ -299,7 +299,7 @@ def alphabeta(state, depth, alpha, beta, maximizing_player, player, start_time, 
         value = -float('inf')
         for move in legal_moves:
             child = apply_move(state, move)
-            child_value, _ = alphabeta(child, depth - 1, alpha, beta, False, player, start_time)
+            child_value, _ = alphabeta(child, depth - 1, alpha, beta, False, player, start_time, from_root+1)
             if child_value > value:
                 value = child_value
                 best_move = move
@@ -311,7 +311,7 @@ def alphabeta(state, depth, alpha, beta, maximizing_player, player, start_time, 
         value = float('inf')
         for move in legal_moves:
             child = apply_move(state, move)
-            child_value, _ = alphabeta(child, depth - 1, alpha, beta, True, player, start_time)
+            child_value, _ = alphabeta(child, depth - 1, alpha, beta, True, player, start_time, from_root+1)
             if child_value < value:
                 value = child_value
                 best_move = move
@@ -323,23 +323,18 @@ def alphabeta(state, depth, alpha, beta, maximizing_player, player, start_time, 
 # Continuously runs the minimax algorithm with alpha-beta pruning at iterating depths until time is up
 # Returns the best move found by the algorithm
 def iterative_deepening(state, player):
-    global IMMEDIATE_MODE
-    IMMEDIATE_MODE = True # global variable to track whether we are searching the immediate next move (to check for possible mills/mill blocks)
     start_time = time.time()
     best_move = None
     depth = 1
     while True:
         if time.time() - start_time > TIME_LIMIT * 0.9:
             break
-        value, move = alphabeta(state, depth, -float('inf'), float('inf'), True, player, start_time, is_root=True)
-        # print("Directly after alpha beta:")
-        # print(move)
+        value, move = alphabeta(state, depth, -float('inf'), float('inf'), True, player, start_time, from_root=0)
         if time.time() - start_time > TIME_LIMIT * 0.9:
             break
         if move is not None:
             best_move = move
         depth += 1
-        IMMEDIATE_MODE = False
     return best_move
 
 
@@ -369,49 +364,49 @@ def move_to_string(move, player_color):
 # Removal is used when your move will get a mill, if your move does not get a mill leave this as "r0", and if it does score a mill enter the board coordinate of the opponent piece to remove
 # A full valid move may look like "h1 a4 r0" or "g7 g4 b6"
 
-# def main():
-#     # Read initial color
-#     print("Enter color:")
-#     player_color = input().strip().lower()
-#     # log_debug(player_color)
+def main():
+    # Read initial color
+    print("Enter the AI player's color:")
+    player_color = input().strip().lower()
+    # log_debug(player_color)
     
-#     state = initial_state()
-#     state["turn"] = "blue" 
+    state = initial_state()
+    state["turn"] = "blue" 
     
-#     # Blue makes the first move
-#     if player_color == "blue":
-#         move = iterative_deepening(state, player_color)
-#         if move is None:
-#             sys.exit("No valid move found")
-#         state = apply_move(state, move)
+    # Blue makes the first move
+    if player_color == "blue":
+        move = iterative_deepening(state, player_color)
+        if move is None:
+            sys.exit("No valid move found")
+        state = apply_move(state, move)
 
-#         print(move_to_string(move, player_color), flush=True)
+        print(move_to_string(move, player_color), flush=True)
     
-#     # Main loop
-#     while True:
-#         try:
-#             print("Enter move:")
-#             game_input = input().strip()
-#             if game_input.startswith("END"):
-#                 break
+    # Main loop
+    while True:
+        try:
+            print("Enter your move:")
+            game_input = input().strip()
+            if game_input.startswith("END"):
+                break
 
-#             opp_move = parse_move(game_input)
-#             state = apply_move(state, opp_move)
+            opp_move = parse_move(game_input)
+            state = apply_move(state, opp_move)
 
-#             if is_terminal(state):
-#                 break
+            if is_terminal(state):
+                break
 
-#             move = iterative_deepening(state, player_color)
-#             if move is None:
-#                 break
-#             state = apply_move(state, move)
-#             print(move_to_string(move, player_color), flush=True)
+            move = iterative_deepening(state, player_color)
+            if move is None:
+                break
+            state = apply_move(state, move)
+            print(move_to_string(move, player_color), flush=True)
 
-#             if is_terminal(state):
-#                 break
+            if is_terminal(state):
+                break
 
-#         except EOFError:
-#             break
+        except EOFError:
+            break
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

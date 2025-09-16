@@ -19,6 +19,18 @@ html, body {
   justify-content: center;
 }
 
+a:link{
+  color:#45a29e
+}
+
+a:visited{
+  color:#45a29e
+}
+
+a:hover{
+  color:#66fcf1
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -100,7 +112,7 @@ html, body {
 
 .modal-body {
   padding: 1rem 1.25rem;
-  overflow: auto;                /* scrolls if content is long */
+  overflow: auto;
   line-height: 1.5;
 }
 
@@ -115,7 +127,6 @@ html, body {
 }
 .modal-close:hover { color: var(--accent); }
 
-/* Optional: a subtle divider look for header/footer on dark bg */
 .modal-header, .modal-footer { background: #1a1a1a; }
 
 /* ------------------------- */
@@ -384,9 +395,9 @@ circle.hand { fill: #ccc; stroke: #333; stroke-width: 1; cursor: pointer; }
 circle.hand.player1-hand { fill: blue; }
 circle.hand.player2-hand { fill: red; cursor: default; }
 circle.hand.selected { stroke: yellow; stroke-width: 3; }
-.modal-lm{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);}
+.modal-lm{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#212121;}
 .modal-lm.show{display:flex;}
-.modal-card-lm{background:#fff;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.2);padding:20px;max-width:320px;text-align:center;}
+.modal-card-lm{background:#514c4c;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.2);padding:20px;max-width:320px;text-align:center;}
 .modal-card-lm h2{margin:0 0 10px;font-size:20px;}
 .modal-card-lm p{margin:0 0 16px;}
 .modal-card-lm button{padding:8px 12px;border:1px solid #333;border-radius:6px;background:#f3f3f3;cursor:pointer;}

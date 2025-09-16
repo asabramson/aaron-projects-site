@@ -22,3 +22,8 @@ commit in that project.
 - Wording on error page for 403 code slightly edited
 - FUTURE: Add database connection to the Lasker Morris game
     - A DB model already exists (LaskerMorrisStats) which will store the user's total number of games played and win count, it just needs to be wired to the routes
+
+# V2.1 - 9/16/25 - Lasker Morris Concurrency Fix
+
+- Race condition caused by global variable removed (stateless implementation + `Lock` from `threading` module)
+- Global styling for anchor/links
