@@ -364,49 +364,49 @@ def move_to_string(move, player_color):
 # Removal is used when your move will get a mill, if your move does not get a mill leave this as "r0", and if it does score a mill enter the board coordinate of the opponent piece to remove
 # A full valid move may look like "h1 a4 r0" or "g7 g4 b6"
 
-def main():
-    # Read initial color
-    print("Enter the AI player's color:")
-    player_color = input().strip().lower()
-    # log_debug(player_color)
+# def main():
+#     # Read initial color
+#     print("Enter the AI player's color:")
+#     player_color = input().strip().lower()
+#     # log_debug(player_color)
     
-    state = initial_state()
-    state["turn"] = "blue" 
+#     state = initial_state()
+#     state["turn"] = "blue" 
     
-    # Blue makes the first move
-    if player_color == "blue":
-        move = iterative_deepening(state, player_color)
-        if move is None:
-            sys.exit("No valid move found")
-        state = apply_move(state, move)
+#     # Blue makes the first move
+#     if player_color == "blue":
+#         move = iterative_deepening(state, player_color)
+#         if move is None:
+#             sys.exit("No valid move found")
+#         state = apply_move(state, move)
 
-        print(move_to_string(move, player_color), flush=True)
+#         print(move_to_string(move, player_color), flush=True)
     
-    # Main loop
-    while True:
-        try:
-            print("Enter your move:")
-            game_input = input().strip()
-            if game_input.startswith("END"):
-                break
+#     # Main loop
+#     while True:
+#         try:
+#             print("Enter your move:")
+#             game_input = input().strip()
+#             if game_input.startswith("END"):
+#                 break
 
-            opp_move = parse_move(game_input)
-            state = apply_move(state, opp_move)
+#             opp_move = parse_move(game_input)
+#             state = apply_move(state, opp_move)
 
-            if is_terminal(state):
-                break
+#             if is_terminal(state):
+#                 break
 
-            move = iterative_deepening(state, player_color)
-            if move is None:
-                break
-            state = apply_move(state, move)
-            print(move_to_string(move, player_color), flush=True)
+#             move = iterative_deepening(state, player_color)
+#             if move is None:
+#                 break
+#             state = apply_move(state, move)
+#             print(move_to_string(move, player_color), flush=True)
 
-            if is_terminal(state):
-                break
+#             if is_terminal(state):
+#                 break
 
-        except EOFError:
-            break
+#         except EOFError:
+#             break
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
